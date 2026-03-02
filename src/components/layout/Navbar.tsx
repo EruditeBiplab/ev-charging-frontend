@@ -1,6 +1,6 @@
 // src/components/layout/Navbar.tsx
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Zap, BookOpen, LogOut, LogIn, Menu, X } from 'lucide-react';
+import { Zap, LogOut, LogIn, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
 
