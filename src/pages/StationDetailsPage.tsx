@@ -1,12 +1,13 @@
 // src/pages/StationDetailsPage.tsx
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Zap, Wifi, Car, Coffee, Bath, ChevronLeft, Check } from 'lucide-react';
 import type { Station } from '../types';
 import { getStationById } from '../api/stationsApi';
 import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 
-const amenityIcon: Record<string, React.ReactNode> = {
+const amenityIcon: Record<string, ReactNode> = {
     WiFi: <Wifi size={14} />, Parking: <Car size={14} />,
     Café: <Coffee size={14} />, 'Food Court': <Coffee size={14} />,
     Restroom: <Bath size={14} />,

@@ -12,7 +12,6 @@ import SlotSelectionPage from './pages/SlotSelectionPage';
 import CheckoutPage from './pages/CheckoutPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import MyBookingsPage from './pages/MyBookingsPage';
-import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
   return (
@@ -42,8 +41,6 @@ export default function App() {
                   <ProtectedRoute><MyBookingsPage /></ProtectedRoute>
                 } />
 
-                {/* 404 */}
-                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </main>
           </div>

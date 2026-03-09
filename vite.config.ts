@@ -7,4 +7,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  base: '/ev-charging-frontend/',
+  appType: 'spa',
 })
+
+
