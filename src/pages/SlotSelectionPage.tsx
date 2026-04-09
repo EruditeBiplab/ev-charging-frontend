@@ -59,7 +59,7 @@ export default function SlotSelectionPage() {
     const handleConfirm = () => {
         if (!selectedSlot || !station) return;
         setPendingBooking({ station, slot: selectedSlot, totalAmount });
-        navigate('/checkout');
+        navigate('/vehicle-details');
     };
 
     if (loadingStation) return (

@@ -66,3 +66,12 @@ export interface PendingBooking {
     slot: Slot;
     totalAmount: number;
 }
+
+export interface VehicleDetails {
+    model: string;
+    batteryCapacity: number;  // kWh
+    currentLevel: number;     // 0–100 %
+    targetLevel: number;      // 0–100 %
+    requiredEnergy: number;   // kWh (calculated)
+    estimatedMinutes: number; // minutes (calculated)
+}

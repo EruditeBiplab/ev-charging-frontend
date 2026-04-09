@@ -1,21 +1,23 @@
 // src/context/BookingContext.tsx
 import { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import type { PendingBooking, Booking } from '../types';
+import type { PendingBooking, Booking, VehicleDetails } from '../types';
 
 interface BookingContextValue {
     pendingBooking: PendingBooking | null;
     setPendingBooking: (b: PendingBooking | null) => void;
     lastBooking: Booking | null;
     setLastBooking: (b: Booking | null) => void;
+    vehicleDetails: VehicleDetails | null;
+    setVehicleDetails: (v: VehicleDetails | null) => void;
 }
 
 const BookingContext = createContext<BookingContextValue | null>(null);
 
 export function BookingProvider({ children }: { children: ReactNode }) {
     const [pendingBooking, setPendingBooking] = useState<PendingBooking | null>(null);
+    const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails | null>(null);
     const [lastBooking, setLastBookingState] = useState<Booking | null>(() => {
-        // Hydrate from sessionStorage in case of page navigation
         const stored = sessionStorage.getItem('ev_last_booking');
         return stored ? JSON.parse(stored) as Booking : null;
     });
@@ -30,7 +32,11 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     }, []);
 
     return (
-        <BookingContext.Provider value={{ pendingBooking, setPendingBooking, lastBooking, setLastBooking }}>
+        <BookingContext.Provider value={{
+            pendingBooking, setPendingBooking,
+            lastBooking, setLastBooking,
+            vehicleDetails, setVehicleDetails,
+        }}>
             {children}
         </BookingContext.Provider>
     );

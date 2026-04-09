@@ -1,7 +1,6 @@
-// src/pages/CheckoutPage.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Zap, Calendar, Clock, Shield, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Zap, Calendar, Clock, Shield, AlertCircle, Car, Battery } from 'lucide-react';
 import { useBookingContext } from '../context/BookingContext';
 import { useAuth } from '../context/AuthContext';
 import { createBooking } from '../api/bookingsApi';
@@ -9,7 +8,7 @@ import type { PaymentMethod } from '../types';
 import PaymentOption from '../components/ui/PaymentOption';
 
 export default function CheckoutPage() {
-    const { pendingBooking, setPendingBooking, setLastBooking } = useBookingContext();
+    const { pendingBooking, setPendingBooking, setLastBooking, vehicleDetails } = useBookingContext();
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -100,6 +99,37 @@ export default function CheckoutPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Vehicle Estimate Card */}
+            {vehicleDetails && (
+                <div className="card" style={{ marginBottom: '1.25rem', border: '1px solid rgba(34,197,94,0.2)' }}>
+                    <h2 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#22c55e', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Car size={13} /> Vehicle Details
+                    </h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '0.88rem' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Car size={13} color="#22c55e" /> Model</span>
+                            <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{vehicleDetails.model}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '0.88rem' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Battery size={13} color="#22c55e" /> Battery</span>
+                            <span style={{ color: '#f1f5f9' }}>{vehicleDetails.currentLevel}% → {vehicleDetails.targetLevel}%</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '0.88rem' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Zap size={13} color="#22c55e" /> Energy Required</span>
+                            <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{vehicleDetails.requiredEnergy} kWh</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '0.88rem' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Clock size={13} color="#22c55e" /> Est. Charge Time</span>
+                            <span style={{ color: '#f1f5f9', fontWeight: 600 }}>
+                                {vehicleDetails.estimatedMinutes < 60
+                                    ? `${vehicleDetails.estimatedMinutes} min`
+                                    : `${Math.floor(vehicleDetails.estimatedMinutes / 60)} hr ${vehicleDetails.estimatedMinutes % 60} min`}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Price Breakdown */}
             <div className="card" style={{ marginBottom: '1.25rem' }}>

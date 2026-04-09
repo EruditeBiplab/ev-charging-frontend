@@ -13,6 +13,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import ProfilePage from './pages/ProfilePage';
+import VehicleDetailsPage from './pages/VehicleDetailsPage';
 
 export default function App() {
   return (
@@ -31,6 +32,9 @@ export default function App() {
                 {/* Protected routes */}
                 <Route path="/station/:id/book" element={
                   <ProtectedRoute><SlotSelectionPage /></ProtectedRoute>
+                } />
+                <Route path="/vehicle-details" element={
+                  <ProtectedRoute><VehicleDetailsPage /></ProtectedRoute>
                 } />
                 <Route path="/checkout" element={
                   <ProtectedRoute><CheckoutPage /></ProtectedRoute>
