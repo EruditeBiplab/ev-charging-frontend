@@ -1,39 +1,29 @@
 // src/api/stationsApi.ts
-import { stations } from '../data/stations';
-import { slots } from '../data/slots';
 import type { Station, Slot, FilterOptions } from '../types';
 
-const delay = (ms = 800) => new Promise(res => setTimeout(res, ms));
+const BASE = '/api';
 
 export async function searchStations(query: string, filters: FilterOptions): Promise<Station[]> {
-    await delay();
-    let result = stations.filter(s =>
-        s.name.toLowerCase().includes(query.toLowerCase()) ||
-        s.city.toLowerCase().includes(query.toLowerCase()) ||
-        s.address.toLowerCase().includes(query.toLowerCase())
-    );
+    const params = new URLSearchParams();
+    if (query) params.set('query', query);
+    if (filters.sortBy) params.set('sortBy', filters.sortBy);
+    if (filters.fastCharging) params.set('fastCharging', 'true');
 
-    if (filters.fastCharging) {
-        result = result.filter(s => s.connectors.some(c => c.toLowerCase().includes('ccs') || c.toLowerCase().includes('chad')));
-    }
-
-    if (filters.sortBy === 'distance') {
-        result = result.sort((a, b) => a.distance - b.distance);
-    } else if (filters.sortBy === 'price') {
-        result = result.sort((a, b) => a.pricePerKwh - b.pricePerKwh);
-    } else if (filters.sortBy === 'rating') {
-        result = result.sort((a, b) => b.rating - a.rating);
-    }
-
-    return result;
+    const res = await fetch(`${BASE}/stations?${params.toString()}`);
+    if (!res.ok) throw new Error('Failed to fetch stations');
+    return res.json() as Promise<Station[]>;
 }
 
 export async function getStationById(id: string): Promise<Station | undefined> {
-    await delay(600);
-    return stations.find(s => s.id === id);
+    const res = await fetch(`${BASE}/stations/${id}`);
+    if (res.status === 404) return undefined;
+    if (!res.ok) throw new Error('Failed to fetch station');
+    return res.json() as Promise<Station>;
 }
 
 export async function getSlotsByStation(stationId: string, date: string): Promise<Slot[]> {
-    await delay(700);
-    return slots.filter(s => s.stationId === stationId && s.date === date);
+    const params = new URLSearchParams({ stationId, date });
+    const res = await fetch(`${BASE}/slots?${params.toString()}`);
+    if (!res.ok) throw new Error('Failed to fetch slots');
+    return res.json() as Promise<Slot[]>;
 }

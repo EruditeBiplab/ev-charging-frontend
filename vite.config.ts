@@ -8,6 +8,14 @@ export default defineConfig({
     tailwindcss(),
   ],
   appType: 'spa',
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
+  },
 })
 
 

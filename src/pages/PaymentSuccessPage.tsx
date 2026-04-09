@@ -5,16 +5,18 @@ import { CheckCircle, Calendar, Clock, MapPin } from 'lucide-react';
 import { useBookingContext } from '../context/BookingContext';
 
 export default function PaymentSuccessPage() {
-    const { lastBooking } = useBookingContext();
+    const { lastBooking, setLastBooking } = useBookingContext();
     const navigate = useNavigate();
 
-    // Redirect if no booking context
+    // Only redirect if there's truly no booking (e.g. user typed URL directly).
+    // Empty deps array = runs ONCE on mount only, no re-run loops.
     useEffect(() => {
         if (!lastBooking) {
-            const t = setTimeout(() => navigate('/'), 3000);
+            const t = setTimeout(() => navigate('/'), 2000);
             return () => clearTimeout(t);
         }
-    }, [lastBooking, navigate]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // intentionally empty deps — check only on first mount
 
     if (!lastBooking) {
         return (
@@ -28,6 +30,17 @@ export default function PaymentSuccessPage() {
     const dateLabel = new Date(lastBooking.date + 'T00:00:00').toLocaleDateString('en-IN', {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     });
+
+    // Clear the stored booking and navigate — called only on explicit user action
+    const handleGoToBookings = () => {
+        setLastBooking(null);
+        navigate('/my-bookings');
+    };
+
+    const handleFindStation = () => {
+        setLastBooking(null);
+        navigate('/');
+    };
 
     return (
         <div
@@ -102,11 +115,11 @@ export default function PaymentSuccessPage() {
                     </div>
                 </div>
 
-                {/* CTA */}
+                {/* CTA buttons */}
                 <button
                     className="btn-primary"
                     style={{ width: '100%', fontSize: '1rem', padding: '0.9rem', marginBottom: '0.75rem' }}
-                    onClick={() => navigate('/my-bookings')}
+                    onClick={handleGoToBookings}
                     aria-label="Go to My Bookings"
                 >
                     Go to My Bookings
@@ -115,7 +128,7 @@ export default function PaymentSuccessPage() {
                 <button
                     className="btn-secondary"
                     style={{ width: '100%', fontSize: '0.9rem' }}
-                    onClick={() => navigate('/')}
+                    onClick={handleFindStation}
                 >
                     Find Another Station
                 </button>

@@ -1,13 +1,16 @@
 // src/api/bookingsApi.ts
 import type { Booking, PaymentMethod, ChargerType } from '../types';
-import { seedBookings } from '../data/bookings';
 
-const delay = (ms = 1000) => new Promise(res => setTimeout(res, ms));
+const BASE = '/api';
 
-// In-memory store
-const bookingStore: Booking[] = [...seedBookings];
+function getToken(): string | null {
+    return localStorage.getItem('ev_token');
+}
 
-let idCounter = 100;
+function authHeaders(): HeadersInit {
+    const token = getToken();
+    return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+}
 
 export async function createBooking(params: {
     userId: string;
@@ -21,37 +24,33 @@ export async function createBooking(params: {
     totalAmount: number;
     paymentMethod: PaymentMethod;
 }): Promise<Booking> {
-    await delay(1200);
-    const booking: Booking = {
-        id: `BK-${Date.now().toString(36).toUpperCase()}${(++idCounter)}`,
-        userId: params.userId,
-        stationId: params.stationId,
-        slotId: params.slotId,
-        stationName: params.stationName,
-        date: params.date,
-        startTime: params.startTime,
-        endTime: params.endTime,
-        chargerType: params.chargerType,
-        totalAmount: params.totalAmount,
-        status: 'Confirmed',
-        paymentMethod: params.paymentMethod,
-        createdAt: new Date().toISOString(),
-    };
-    bookingStore.push(booking);
-    return booking;
+    const res = await fetch(`${BASE}/bookings`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Failed to create booking' })) as { error: string };
+        throw new Error(err.error || 'Failed to create booking');
+    }
+    return res.json() as Promise<Booking>;
 }
 
-export async function getBookingsByUser(userId: string): Promise<Booking[]> {
-    await delay();
-    return bookingStore
-        .filter(b => b.userId === userId)
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+export async function getBookingsByUser(_userId: string): Promise<Booking[]> {
+    const res = await fetch(`${BASE}/bookings/me`, {
+        headers: authHeaders(),
+    });
+    if (!res.ok) throw new Error('Failed to fetch bookings');
+    return res.json() as Promise<Booking[]>;
 }
 
 export async function cancelBooking(bookingId: string): Promise<void> {
-    await delay(600);
-    const idx = bookingStore.findIndex(b => b.id === bookingId);
-    if (idx !== -1) {
-        bookingStore[idx] = { ...bookingStore[idx], status: 'Cancelled' };
+    const res = await fetch(`${BASE}/bookings/${bookingId}/cancel`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Failed to cancel booking' })) as { error: string };
+        throw new Error(err.error || 'Failed to cancel booking');
     }
 }

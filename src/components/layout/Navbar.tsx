@@ -16,7 +16,7 @@ export default function Navbar() {
     };
 
     const navLinks = isAuthenticated
-        ? [{ to: '/', label: 'Stations' }, { to: '/my-bookings', label: 'My Bookings' }]
+        ? [{ to: '/', label: 'Stations' }, { to: '/my-bookings', label: 'My Bookings' }, { to: '/profile', label: 'Profile' }]
         : [{ to: '/', label: 'Stations' }];
 
     return (
@@ -68,9 +68,19 @@ export default function Navbar() {
 
                         {isAuthenticated ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
-                                    👋 {user?.name.split(' ')[0]}
-                                </span>
+                                <button
+                                    onClick={() => navigate('/profile')}
+                                    style={{
+                                        background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)',
+                                        borderRadius: '9999px', padding: '0.3rem 0.8rem',
+                                        color: '#86efac', cursor: 'pointer', fontSize: '0.85rem',
+                                        fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem',
+                                        transition: 'all 0.2s',
+                                    }}
+                                    aria-label="Go to profile"
+                                >
+                                    <span style={{ fontSize: '0.95rem' }}>👋</span> {user?.name.split(' ')[0]}
+                                </button>
                                 <button onClick={handleLogout} className="btn-secondary" style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}>
                                     <LogOut size={15} /> Logout
                                 </button>

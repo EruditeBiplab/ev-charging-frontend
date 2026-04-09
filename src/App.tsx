@@ -12,6 +12,7 @@ import SlotSelectionPage from './pages/SlotSelectionPage';
 import CheckoutPage from './pages/CheckoutPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import MyBookingsPage from './pages/MyBookingsPage';
+import ProfilePage from './pages/ProfilePage';
 
 export default function App() {
   return (
@@ -39,6 +40,9 @@ export default function App() {
                 } />
                 <Route path="/my-bookings" element={
                   <ProtectedRoute><MyBookingsPage /></ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute><ProfilePage /></ProtectedRoute>
                 } />
 
               </Routes>

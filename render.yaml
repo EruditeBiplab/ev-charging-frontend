@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ev-charging-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.4.0
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: https://ev-charging-frontend.vercel.app
