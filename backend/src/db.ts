@@ -1,15 +1,15 @@
 // backend/src/db.ts
-import { DatabaseSync } from 'node:sqlite';
+import Database from 'better-sqlite3';
 import path from 'path';
 import { seedDatabase } from './seed';
 
 const DB_PATH = path.join(__dirname, '..', 'ev_charging.db');
 
-let _db: DatabaseSync | null = null;
+let _db: Database.Database | null = null;
 
-export function getDb(): DatabaseSync {
+export function getDb(): Database.Database {
     if (!_db) {
-        _db = new DatabaseSync(DB_PATH);
+        _db = new Database(DB_PATH);
         _db.exec('PRAGMA journal_mode = WAL');
         _db.exec('PRAGMA foreign_keys = ON');
         initSchema(_db);
@@ -18,7 +18,7 @@ export function getDb(): DatabaseSync {
     return _db;
 }
 
-function initSchema(db: DatabaseSync) {
+function initSchema(db: Database.Database) {
     db.exec(`
         CREATE TABLE IF NOT EXISTS users (
             id          TEXT PRIMARY KEY,
@@ -39,8 +39,8 @@ function initSchema(db: DatabaseSync) {
             review_count    INTEGER NOT NULL DEFAULT 0,
             availability    TEXT NOT NULL DEFAULT 'Available',
             price_per_kwh   REAL NOT NULL,
-            connectors      TEXT NOT NULL,   -- JSON array
-            amenities       TEXT NOT NULL,   -- JSON array
+            connectors      TEXT NOT NULL,
+            amenities       TEXT NOT NULL,
             lat             REAL NOT NULL,
             lng             REAL NOT NULL,
             total_ports     INTEGER NOT NULL DEFAULT 0,
