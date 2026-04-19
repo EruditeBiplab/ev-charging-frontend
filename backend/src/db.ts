@@ -78,5 +78,13 @@ function initSchema(db: Database.Database) {
             key   TEXT PRIMARY KEY,
             value TEXT NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS password_reset_otps (
+            email      TEXT NOT NULL,
+            otp        TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            used       INTEGER NOT NULL DEFAULT 0,
+            PRIMARY KEY (email)
+        );
     `);
 }

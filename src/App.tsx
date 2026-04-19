@@ -6,6 +6,7 @@ import Navbar from './components/layout/Navbar';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import StationSearchPage from './pages/StationSearchPage';
 import StationDetailsPage from './pages/StationDetailsPage';
 import SlotSelectionPage from './pages/SlotSelectionPage';
@@ -28,6 +29,7 @@ export default function App() {
                 {/* Public routes */}
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/" element={<StationSearchPage />} />
                 <Route path="/station/:id" element={<StationDetailsPage />} />
 

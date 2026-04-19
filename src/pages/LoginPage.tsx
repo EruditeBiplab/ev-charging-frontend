@@ -1,7 +1,7 @@
 // src/pages/LoginPage.tsx
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Zap, User, Mail, Phone, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
@@ -31,8 +31,7 @@ export default function LoginPage() {
     const registerForm = useForm<RegisterForm>();
 
     if (isAuthenticated) {
-        navigate(from, { replace: true });
-        return null;
+        return <Navigate to={from} replace />;
     }
 
     const onLogin = async (data: LoginForm) => {
@@ -191,6 +190,14 @@ export default function LoginPage() {
                                     </button>
                                 </div>
                                 {loginForm.formState.errors.password && <p style={errorStyle}>{loginForm.formState.errors.password.message}</p>}
+                                <div style={{ textAlign: 'right', marginTop: '0.4rem' }}>
+                                    <Link
+                                        to="/forgot-password"
+                                        style={{ fontSize: '0.8rem', color: '#22c55e', textDecoration: 'none', fontWeight: 500 }}
+                                    >
+                                        Forgot password?
+                                    </Link>
+                                </div>
                             </div>
 
                             <button

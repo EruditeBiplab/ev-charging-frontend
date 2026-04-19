@@ -143,5 +143,102 @@ router.put('/me', (req: Request, res: Response) => {
     }
 });
 
+// POST /api/auth/forgot-password
+// Generates a 6-digit OTP valid for 15 min and returns it (demo mode — in production this would be emailed)
+router.post('/forgot-password', async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body as { email?: string };
+        if (!email) {
+            res.status(400).json({ error: 'email is required' });
+            return;
+        }
+
+        const db = getDb();
+        const user = db.prepare('SELECT id FROM users WHERE email = ?').get(email.trim().toLowerCase()) as { id: string } | undefined;
+
+        // Always respond with success to avoid email enumeration
+        if (!user) {
+            res.json({ message: 'If that email is registered, a reset code has been sent.' });
+            return;
+        }
+
+        // Generate a 6-digit OTP
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
+
+        // Upsert: replace any existing OTP for this email
+        db.prepare(`
+            INSERT INTO password_reset_otps (email, otp, expires_at, used)
+            VALUES (?, ?, ?, 0)
+            ON CONFLICT(email) DO UPDATE SET otp=excluded.otp, expires_at=excluded.expires_at, used=0
+        `).run(email.trim().toLowerCase(), otp, expiresAt);
+
+        // In production, send otp via email. For demo, return it directly.
+        res.json({
+            message: 'If that email is registered, a reset code has been sent.',
+            demo_otp: otp, // Remove this line in production
+        });
+    } catch (err) {
+        console.error('POST /forgot-password error:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// POST /api/auth/reset-password
+// Verifies the OTP and sets a new password
+router.post('/reset-password', async (req: Request, res: Response) => {
+    try {
+        const { email, otp, newPassword } = req.body as {
+            email?: string; otp?: string; newPassword?: string;
+        };
+
+        if (!email || !otp || !newPassword) {
+            res.status(400).json({ error: 'email, otp, and newPassword are required' });
+            return;
+        }
+        if (newPassword.length < 6) {
+            res.status(400).json({ error: 'Password must be at least 6 characters' });
+            return;
+        }
+
+        const db = getDb();
+        const record = db.prepare(
+            'SELECT otp, expires_at, used FROM password_reset_otps WHERE email = ?'
+        ).get(email.trim().toLowerCase()) as { otp: string; expires_at: string; used: number } | undefined;
+
+        if (!record || record.used === 1) {
+            res.status(400).json({ error: 'Invalid or already used reset code.' });
+            return;
+        }
+        if (new Date(record.expires_at) < new Date()) {
+            res.status(400).json({ error: 'Reset code has expired. Please request a new one.' });
+            return;
+        }
+        if (record.otp !== otp.trim()) {
+            res.status(400).json({ error: 'Incorrect reset code.' });
+            return;
+        }
+
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+
+        try {
+            db.exec('BEGIN TRANSACTION');
+            db.prepare('UPDATE users SET password_hash = ? WHERE email = ?')
+              .run(passwordHash, email.trim().toLowerCase());
+            db.prepare('UPDATE password_reset_otps SET used = 1 WHERE email = ?')
+              .run(email.trim().toLowerCase());
+            db.exec('COMMIT');
+        } catch (err) {
+            db.exec('ROLLBACK');
+            throw err;
+        }
+
+        res.json({ message: 'Password reset successfully. You can now log in.' });
+    } catch (err) {
+        console.error('POST /reset-password error:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 export default router;
 
