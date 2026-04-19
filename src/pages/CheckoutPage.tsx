@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Zap, Calendar, Clock, Shield, AlertCircle, Car, Battery } from 'lucide-react';
+import { ChevronLeft, Zap, Calendar, Clock, Shield, AlertCircle, Car, Battery, LogIn } from 'lucide-react';
 import { useBookingContext } from '../context/BookingContext';
 import { useAuth } from '../context/AuthContext';
 import { createBooking } from '../api/bookingsApi';
@@ -54,8 +54,15 @@ export default function CheckoutPage() {
             setLastBooking(booking);
             setPendingBooking(null);
             navigate('/payment-success');
-        } catch {
-            setError('Payment failed. Please try again.');
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Payment failed. Please try again.';
+            // If the token expired the API cleared localStorage — redirect to login
+            if (!localStorage.getItem('ev_token')) {
+                setError('Your session has expired. Please log in again.');
+                setTimeout(() => navigate('/login'), 2000);
+            } else {
+                setError(message);
+            }
         } finally {
             setLoading(false);
         }
@@ -181,6 +188,17 @@ export default function CheckoutPage() {
                     marginBottom: '1rem', color: '#f87171', fontSize: '0.88rem',
                 }} role="alert">
                     <AlertCircle size={16} /> {error}
+                    {!localStorage.getItem('ev_token') && (
+                        <button
+                            onClick={() => navigate('/login')}
+                            style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.3rem',
+                                background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.5)',
+                                borderRadius: '0.4rem', padding: '0.25rem 0.6rem', color: '#f87171',
+                                cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600 }}
+                        >
+                            <LogIn size={13} /> Log in
+                        </button>
+                    )}
                 </div>
             )}
 

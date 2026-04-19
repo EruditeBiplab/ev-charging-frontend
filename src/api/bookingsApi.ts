@@ -12,6 +12,14 @@ function authHeaders(): HeadersInit {
     return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
 }
 
+/** Clears a stale session if the server signals the token is invalid. */
+function handleAuthError(status: number): void {
+    if (status === 401) {
+        localStorage.removeItem('ev_token');
+        localStorage.removeItem('ev_user');
+    }
+}
+
 export async function createBooking(params: {
     userId: string;
     stationId: string;
@@ -30,6 +38,7 @@ export async function createBooking(params: {
         body: JSON.stringify(params),
     });
     if (!res.ok) {
+        handleAuthError(res.status);
         const err = await res.json().catch(() => ({ error: 'Failed to create booking' })) as { error: string };
         throw new Error(err.error || 'Failed to create booking');
     }

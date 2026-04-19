@@ -5,6 +5,7 @@ import authRouter from './routes/auth';
 import stationsRouter from './routes/stations';
 import slotsRouter from './routes/slots';
 import bookingsRouter from './routes/bookings';
+import adminRouter from './routes/admin';
 
 // Trigger DB init + seed on startup
 import { getDb } from './db';
@@ -37,6 +38,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/stations', stationsRouter);
 app.use('/api/slots', slotsRouter);
 app.use('/api/bookings', bookingsRouter);
+app.use('/api/admin', adminRouter);
 
 // 404 fallback
 app.use((_req, res) => {

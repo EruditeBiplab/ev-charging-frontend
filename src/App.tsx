@@ -14,6 +14,7 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import ProfilePage from './pages/ProfilePage';
 import VehicleDetailsPage from './pages/VehicleDetailsPage';
+import AdminPage from './pages/AdminPage';
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
             <main>
               <Routes>
                 {/* Public routes */}
+                <Route path="/admin" element={<AdminPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/" element={<StationSearchPage />} />
                 <Route path="/station/:id" element={<StationDetailsPage />} />

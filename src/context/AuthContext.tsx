@@ -1,5 +1,5 @@
 // src/context/AuthContext.tsx
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '../types';
 
@@ -23,6 +23,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const stored = localStorage.getItem('ev_user');
         return stored ? JSON.parse(stored) as User : null;
     });
+
+    // On mount, silently validate the stored token.
+    // If the server rejects it (expired/invalid), clear the stale session.
+    useEffect(() => {
+        const token = localStorage.getItem('ev_token');
+        if (!token) return;
+        fetch('/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` },
+        }).then(res => {
+            if (res.status === 401) {
+                setUser(null);
+                localStorage.removeItem('ev_token');
+                localStorage.removeItem('ev_user');
+            }
+        }).catch(() => { /* network offline — keep session */ });
+    }, []);
 
     const login = async (email: string, password: string) => {
         const res = await fetch('/api/auth/login', {
