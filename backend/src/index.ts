@@ -14,14 +14,16 @@ getDb();
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 4000;
 
-// CORS — allow configured origins (Vercel URL set via env in production)
+// CORS — allow configured origins + any *.vercel.app deployment
 // ALLOWED_ORIGINS = comma-separated list, e.g. "https://ev-charge.vercel.app,http://localhost:5173"
 const rawOrigins = process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:4173';
 const allowedOrigins = rawOrigins.split(',').map(o => o.trim());
 app.use(cors({
     origin: (origin, cb) => {
-        // Allow requests with no origin (curl, Render health checks, same-origin proxy)
-        if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+        // Allow: no origin (curl, Render health checks), explicit allow-list, any *.vercel.app URL
+        if (!origin) return cb(null, true);
+        if (allowedOrigins.includes(origin)) return cb(null, true);
+        if (/^https:\/\/[a-z0-9-]+(\.vercel\.app)$/.test(origin)) return cb(null, true);
         cb(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,
